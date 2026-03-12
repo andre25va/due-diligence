@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0d1b2e" />
+  <title>ROA KC · Due Diligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --navy:    #0d1b2e;
+      --navy2:   #1a3152;
+      --gold:    #f5a623;
+      --gold2:   #e8960f;
+      --bg:      #f0f2f7;
+      --surface: #ffffff;
+      --border:  #e4e8f0;
+      --text:    #111827;
+      --muted:   #6b7280;
+      --green:   #10b981;
+      --red:     #ef4444;
+      --amber:   #f59e0b;
+      --blue:    #3b82f6;
+      --purple:  #8b5cf6;
+      --radius:  16px;
+      --radius-sm: 10px;
+      --shadow:  0 4px 24px rgba(13,27,46,.10);
+      --shadow-sm: 0 2px 8px rgba(13,27,46,.07);
+    }
+
+    html { height: 100%; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100%;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    .app { position: relative; min-height: 100dvh; }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      min-height: 100dvh;
+      animation: fadeIn .22s ease;
+    }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .topbar {
+      background: var(--navy);
+      padding: 16px 20px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-logo {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.3px;
+      flex: 1;
+    }
+    .topbar-logo span { color: var(--gold); }
+    .topbar-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,.55);
+      font-weight: 500;
+      letter-spacing: .2px;
+      margin-top: 1px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.12);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: background .15s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,.2); }
+    .settings-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.10);
+      border: none;
+      border-radius: 10px;
+      color: rgba(255,255,255,.75);
+      cursor: pointer;
+      font-size: 16px;
+      transition: background .15s;
+    }
+    .settings-btn:hover { background: rgba(255,255,255,.2); }
+
+    .page-content {
+      flex: 1;
+      padding: 20px 16px;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .setup-hero {
+      background: var(--navy);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    .setup-hero-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 32px rgba(245,166,35,.35);
+    }
+    .setup-hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.5px;
+      margin-bottom: 8px;
+    }
+    .setup-hero p { font-size: 15px; color: rgba(255,255,255,.6); line-height: 1.5; }
+
+    .setup-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 8px;
+      letter-spacing: .1px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text);
+      background: #f9fafc;
+      outline: none;
+      transition: border-color .18s, background .18s;
+    }
+    .form-input:focus { border-color: var(--navy); background: #fff; }
+    .form-input::placeholder { color: #b0b7c3; }
+    textarea.form-input { resize: vertical; min-height: 88px; }
+    select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .form-hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 15px 24px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform .12s, opacity .15s, box-shadow .15s;
+      letter-spacing: -.1px;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-full { width: 100%; }
+    .btn-primary {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(13,27,46,.3);
+    }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(13,27,46,.4); }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(245,166,35,.35);
+    }
+    .btn-gold:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(245,166,35,.45); }
+    .btn-outline {
+      background: transparent;
+      color: var(--navy);
+      border: 1.5px solid var(--border);
+    }
+    .btn-sm { padding: 10px 16px; font-size: 13px; border-radius: 8px; }
+
+    .agents-hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+      padding: 28px 20px 32px;
+    }
+    .agents-hero h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.4px;
+      margin-bottom: 4px;
+    }
+    .agents-hero p { font-size: 14px; color: rgba(255,255,255,.6); }
+
+    .search-box {
+      position: relative;
+      margin: -20px 16px 0;
+      z-index: 10;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 15px 16px 15px 48px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      box-shadow: var(--shadow);
+      transition: border-color .18s;
+    }
+    .search-box input:focus { border-color: var(--navy); }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    .agents-list-wrap { padding: 16px 16px 24px; }
+    .agents-count {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 12px;
+    }
+
+    .agent-grid { display: flex; flex-direction: column; gap: 8px; }
+    .agent-row {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, transform .12s;
+    }
+    .agent-row:hover { border-color: var(--navy2); box-shadow: var(--shadow-sm); }
+    .agent-row:active { transform: scale(.99); }
+
+    .avatar {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -.5px;
+    }
+    .agent-info { flex: 1; min-width: 0; }
+    .agent-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agent-email { font-size: 12px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chevron { color: #c5cdd8; font-size: 20px; font-weight: 300; flex-shrink: 0; }
+
+    .deals-header { padding: 24px 20px 0; }
+    .deals-header h2 { font-size: 20px; font-weight: 800; color: var(--text); }
+    .deals-header p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+    .deals-grid { display: flex; flex-direction: column; gap: 12px; }
+    .deal-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, transform .12s;
+      overflow: hidden;
+      position: relative;
+    }
+    .deal-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--gold);
+      border-radius: 0 3px 3px 0;
+    }
+    .deal-card:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(245,166,35,.15); }
+    .deal-card:active { transform: scale(.99); }
+    .deal-address {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-left: 8px;
+      line-height: 1.3;
+    }
+    .deal-chips { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 8px; margin-bottom: 14px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .chip-active   { background: #ecfdf5; color: #065f46; }
+    .chip-contract { background: #fff7ed; color: #9a3412; }
+    .chip-closed   { background: #eff6ff; color: #1e40af; }
+    .chip-dead     { background: #fef2f2; color: #991b1b; }
+    .chip-buyer    { background: #eff6ff; color: #1d4ed8; }
+    .chip-seller   { background: #faf5ff; color: #6b21a8; }
+    .chip-both     { background: #ecfdf5; color: #065f46; }
+
+    .deal-prog-wrap { padding-left: 8px; }
+    .prog-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .prog-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .prog-pct { font-size: 12px; font-weight: 700; color: var(--navy); }
+    .prog-track { background: var(--border); border-radius: 99px; height: 5px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green) 0%, #34d399 100%); transition: width .4s ease; }
+
+    .fab {
+      position: fixed;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      right: 20px;
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+      border: none;
+      border-radius: 18px;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(245,166,35,.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s, box-shadow .15s;
+      z-index: 90;
+    }
+    .fab:hover { transform: scale(1.06); box-shadow: 0 8px 28px rgba(245,166,35,.55); }
+    .fab:active { transform: scale(.95); }
+
+    .new-deal-wrap { padding: 20px 16px 120px; max-width: 600px; margin: 0 auto; }
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid var(--border);
+    }
+
+    .deal-banner {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+      padding: 20px;
+    }
+    .deal-banner-addr {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.3px;
+      margin-bottom: 4px;
+    }
+    .deal-banner-meta { font-size: 13px; color: rgba(255,255,255,.6); }
+
+    .status-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .status-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .status-pill.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+    .prog-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .prog-donut-wrap { position: relative; flex-shrink: 0; }
+    .prog-donut { transform: rotate(-90deg); }
+    .donut-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+    .donut-fill { fill: none; stroke: var(--green); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset .5s ease; }
+    .donut-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+    .donut-den { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .prog-info { flex: 1; }
+    .prog-info h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .prog-info p { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+    .cl-list { padding: 0 16px 100px; display: flex; flex-direction: column; gap: 8px; }
+    .cl-item {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color .15s;
+    }
+    .cl-item.s-yes  { border-left: 4px solid var(--green); }
+    .cl-item.s-no   { border-left: 4px solid var(--red); }
+    .cl-item.s-na   { border-left: 4px solid #94a3b8; }
+
+    .cl-header {
+      padding: 15px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cl-bubble {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      background: var(--bg);
+      color: var(--muted);
+      transition: background .2s, color .2s;
+    }
+    .cl-bubble.done { background: var(--green); color: #fff; }
+    .cl-bubble.no   { background: var(--red); color: #fff; }
+    .cl-bubble.na   { background: #94a3b8; color: #fff; }
+
+    .cl-task { font-size: 14px; font-weight: 500; line-height: 1.4; flex: 1; color: var(--text); }
+    .cl-task.answered { color: var(--muted); text-decoration: line-through; opacity: .75; }
+    .cl-arrow { color: #c5cdd8; font-size: 18px; flex-shrink: 0; transition: transform .22s; }
+    .cl-arrow.open { transform: rotate(180deg); }
+
+    .cl-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .28s ease;
+    }
+    .cl-body.open { max-height: 320px; }
+
+    .cl-inner { padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .resp-row { display: flex; gap: 8px; padding-top: 14px; margin-bottom: 14px; }
+    .resp-btn {
+      flex: 1;
+      padding: 12px 6px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      text-align: center;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .resp-btn:hover { border-color: #c5cdd8; }
+    .resp-btn.r-yes.active { background: var(--green); border-color: var(--green); color: #fff; }
+    .resp-btn.r-no.active  { background: var(--red);   border-color: var(--red);   color: #fff; }
+    .resp-btn.r-na.active  { background: #94a3b8; border-color: #94a3b8; color: #fff; }
+
+    .notes-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+    .notes-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 64px;
+      outline: none;
+      color: var(--text);
+      background: #f9fafc;
+      transition: border-color .15s;
+    }
+    .notes-input:focus { border-color: var(--navy); background: #fff; }
+    .save-notes-btn {
+      margin-top: 8px;
+      padding: 9px 18px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: opacity .15s, background .15s;
+    }
+    .save-notes-btn:hover { opacity: .88; }
+    .save-notes-btn.saved { background: var(--green); }
+    .save-notes-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 52px; margin-bottom: 16px; }
+    .empty h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .empty p { font-size: 14px; line-height: 1.5; }
+
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .spin {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+    .spin-sm {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      bottom: max(28px, calc(env(safe-area-inset-bottom) + 16px));
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: var(--navy);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 9999;
+      transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 6px 24px rgba(0,0,0,.3);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.t-success { background: var(--green); }
+    .toast.t-error { background: var(--red); }
+
+    .av-0 { background: linear-gradient(135deg, #0d1b2e, #1a3152); }
+    .av-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .av-2 { background: linear-gradient(135deg, #10b981, #059669); }
+    .av-3 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .av-4 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .av-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
+    .av-6 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .av-7 { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+
+    .sec-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .sec-hd h3 { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+
+    @media (max-width: 380px) {
+      .resp-btn { font-size: 12px; padding: 11px 4px; }
+      .cl-task { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- SCREEN: SETUP -->
+  <div class="screen active" id="screen-setup">
+    <div class="setup-hero">
+      <div class="setup-hero-icon">🏡</div>
+      <h1>ROA KC<br>Due Diligence</h1>
+      <p>Track every detail, close every deal.</p>
+    </div>
+    <div class="page-content" style="padding-top:24px">
+      <div class="setup-card card">
+        <div class="form-group">
+          <label class="form-label">Airtable Personal Access Token</label>
+          <input class="form-input" type="password" id="setupToken" placeholder="patXXXXXXXXXXXX…" />
+          <div class="form-hint">Your token is saved locally on this device only and is never shared.</div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="saveSetup()">
+          Get Started →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: AGENTS -->
+  <div class="screen" id="screen-agents">
+    <div class="agents-hero">
+      <div class="topbar" style="background:transparent;position:static;padding:0 0 20px">
+        <div style="flex:1">
+          <div class="topbar-logo">ROA KC <span>·</span> Due Diligence</div>
+        </div>
+        <button class="settings-btn" onclick="showSetup()">⚙</button>
+      </div>
+      <h2 style="color:#fff;font-size:20px;font-weight:800;margin-bottom:4px">Select Your Name</h2>
+      <p style="color:rgba(255,255,255,.6);font-size:13px">Tap your name to view your deals</p>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="agentSearch" placeholder="Search agents…" oninput="filterAgents()" autocomplete="off" />
+    </div>
+    <div class="agents-list-wrap">
+      <div class="agents-count" id="agentsCount"></div>
+      <div class="agent-grid" id="agentGrid">
+        <div class="loader"><div class="spin"></div>Loading agents…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: DEALS -->
+  <div class="screen" id="screen-deals">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('agents',false)">‹</button>
+      <div style="flex:1">
+        <div class="topbar-logo">My Deals</div>
+        <div class="topbar-sub" id="dealsSubtitle"></div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div id="dealGrid">
+        <div class="loader"><div class="spin"></div>Loading deals…</div>
+      </div>
+    </div>
+    <button class="fab" onclick="goTo('new-deal')" title="New Deal">+</button>
+  </div>
+
+  <!-- SCREEN: NEW DEAL -->
+  <div class="screen" id="screen-new-deal">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('deals',false)">‹</button>
+      <div style="flex:1">
+        <div class="topbar-logo">New Deal</div>
+        <div class="topbar-sub" id="newDealSub"></div>
+      </div>
+    </div>
+    <div class="new-deal-wrap">
+      <p class="section-title">Deal Details</p>
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Property Address *</label>
+          <input class="form-input" type="text" id="ndAddress" placeholder="123 Main St, Kansas City, MO 64111" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Representation</label>
+          <select class="form-input" id="ndType">
+            <option value="Buyer Side">Buyer Side</option>
+            <option value="Seller Side">Seller Side</option>
+            <option value="Both Sides">Both Sides</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+          <textarea class="form-input" id="ndNotes" placeholder="Any notes about this deal…"></textarea>
+        </div>
+        <button class="btn btn-gold btn-full" id="createDealBtn" onclick="createDeal()">
+          Create Deal &amp; Open Checklist →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: CHECKLIST -->
+  <div class="screen" id="screen-checklist">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('deals',false);loadDeals();">‹</button>
+      <div style="flex:1">
+        <div class="topbar-logo">Checklist</div>
+        <div class="topbar-sub" id="clSub"></div>
+      </div>
+    </div>
+    <div class="deal-banner" id="dealBanner">
+      <div class="deal-banner-addr" id="bannerAddr">Loading…</div>
+      <div class="deal-banner-meta" id="bannerMeta"></div>
+      <div class="status-pills" id="statusPills"></div>
+    </div>
+
+    <div class="prog-card">
+      <div class="prog-donut-wrap">
+        <svg class="prog-donut" width="72" height="72" viewBox="0 0 72 72">
+          <circle class="donut-bg" cx="36" cy="36" r="30"/>
+          <circle class="donut-fill" cx="36" cy="36" r="30" id="donutFill"
+            stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        </svg>
+        <div class="donut-label">
+          <div class="donut-num" id="dNum">0</div>
+          <div class="donut-den" id="dDen">/22</div>
+        </div>
+      </div>
+      <div class="prog-info">
+        <h3>Due Diligence</h3>
+        <p id="progMsg">Tap each item to respond</p>
+      </div>
+    </div>
+
+    <div class="cl-list" id="clList">
+      <div class="loader"><div class="spin"></div>Loading checklist…</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE_ID      = 'appBQCUVrmWNuBWkz';
+const TBL_AGENTS   = 'tblMPOGqjGpxhwlLW';
+const TBL_DEALS    = 'tbla9kUHLsMWElw2E';
+const TBL_CHECKLIST= 'tblcEK9i6ztSIxWeA';
+const TBL_RESPONSES= 'tbl77vD60lgNR2jy9';
+
+let token         = localStorage.getItem('roa_token') || '';
+let allAgents     = [];
+let currentAgent  = null;
+let currentDeal   = null;
+let tasks         = [];
+let responses     = {};
+let currentScreen = 'setup';
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (token) { goTo('agents'); loadAgents(); }
+  else        { goTo('setup'); }
+});
+
+function goTo(name, animate = true) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + name);
+  if (el) el.classList.add('active');
+  currentScreen = name;
+  window.scrollTo(0, 0);
+}
+
+function showSetup() {
+  document.getElementById('setupToken').value = token;
+  goTo('setup');
+}
+
+function saveSetup() {
+  const t = document.getElementById('setupToken').value.trim();
+  if (!t) { toast('Please enter your token', 'error'); return; }
+  token = t;
+  localStorage.setItem('roa_token', token);
+  toast('Connected! ✓', 'success');
+  goTo('agents');
+  loadAgents();
+}
+
+async function at(method, table, recordId='', params='', body=null) {
+  let url = `https://api.airtable.com/v0/${BASE_ID}/${table}`;
+  if (recordId) url += '/' + recordId;
+  if (params) url += '?' + params;
+  const opts = {
+    method,
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function atAll(table, params='') {
+  let recs = [], offset = '';
+  do {
+    const p = params + (offset ? (params ? '&' : '') + 'offset=' + offset : '');
+    const d = await at('GET', table, '', p);
+    recs = recs.concat(d.records);
+    offset = d.offset || '';
+  } while (offset);
+  return recs;
+}
+
+async function loadAgents() {
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading agents…</div>';
+  document.getElementById('agentsCount').textContent = '';
+  try {
+    allAgents = await atAll(TBL_AGENTS, 'sort[0][field]=Name&sort[0][direction]=asc');
+    renderAgents(allAgents);
+  } catch (e) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Couldn't load agents</h3><p>Check your token in settings and try again.</p></div>`;
+  }
+}
+
+const COLORS = ['av-0','av-1','av-2','av-3','av-4','av-5','av-6','av-7'];
+function colorFor(name) { let h=0; for(let c of name) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
+
+function renderAgents(list) {
+  const grid = document.getElementById('agentGrid');
+  const countEl = document.getElementById('agentsCount');
+  if (!list.length) {
+    countEl.textContent = '';
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>No agents found</h3></div>';
+    return;
+  }
+  countEl.textContent = `${list.length} Agent${list.length !== 1 ? 's' : ''}`;
+  grid.innerHTML = list.map(a => {
+    const name = a.fields['Name'] || '—';
+    const email = a.fields['Email'] || '';
+    const initials = name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    return `
+      <div class="agent-row" onclick="pickAgent('${a.id}')">
+        <div class="avatar ${colorFor(name)}">${initials}</div>
+        <div class="agent-info">
+          <div class="agent-name">${esc(name)}</div>
+          ${email ? `<div class="agent-email">${esc(email)}</div>` : ''}
+        </div>
+        <div class="chevron">›</div>
+      </div>`;
+  }).join('');
+}
+
+function filterAgents() {
+  const q = document.getElementById('agentSearch').value.toLowerCase();
+  renderAgents(allAgents.filter(a => (a.fields['Name']||'').toLowerCase().includes(q)));
+}
+
+function pickAgent(id) {
+  currentAgent = allAgents.find(a => a.id === id);
+  const name = currentAgent.fields['Name'] || 'Agent';
+  document.getElementById('dealsSubtitle').textContent = name;
+  document.getElementById('newDealSub').textContent = name;
+  goTo('deals');
+  loadDeals();
+}
+
+async function loadDeals() {
+  const grid = document.getElementById('dealGrid');
+  grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading deals…</div>';
+  try {
+    const agentName = currentAgent.fields['Name'];
+    const formula = encodeURIComponent(`{Agent Name}="${agentName}"`);
+    const deals = await atAll(TBL_DEALS, `filterByFormula=${formula}&sort[0][field]=Created Date&sort[0][direction]=desc`);
+
+    if (!deals.length) {
+      grid.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🏠</div>
+          <h3>No deals yet</h3>
+          <p>Tap the <strong>+</strong> button to start your first due diligence checklist.</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading progress…</div>';
+    const counts = {};
+    for (const d of deals) {
+      const resp = await atAll(TBL_RESPONSES, `filterByFormula=${encodeURIComponent(`{Deal ID}="${d.id}"`)}`);
+      counts[d.id] = resp.filter(r => r.fields['Status']).length;
+    }
+
+    const total = tasks.length || 22;
+    grid.innerHTML = `<div class="sec-hd"><h3>${deals.length} Deal${deals.length!==1?'s':''}</h3></div>` +
+      '<div class="deals-grid">' + deals.map(d => {
+        const addr   = d.fields['Property Address'] || 'No address';
+        const status = d.fields['Status'] || 'Active';
+        const type   = d.fields['Deal Type'] || '';
+        const done   = counts[d.id] || 0;
+        const pct    = Math.round((done / total) * 100);
+        const scls   = { Active:'chip-active', 'Under Contract':'chip-contract', Closed:'chip-closed', Dead:'chip-dead' };
+        const tcls   = { 'Buyer Side':'chip-buyer', 'Seller Side':'chip-seller', 'Both Sides':'chip-both' };
+        return `
+          <div class="deal-card" onclick="openDeal('${d.id}')">
+            <div class="deal-address">${esc(addr)}</div>
+            <div class="deal-chips">
+              <span class="chip ${scls[status]||'chip-active'}">${status}</span>
+              ${type ? `<span class="chip ${tcls[type]||'chip-buyer'}">${type}</span>` : ''}
+            </div>
+            <div class="deal-prog-wrap">
+              <div class="prog-row">
+                <span class="prog-label">${done}/${total} items</span>
+                <span class="prog-pct">${pct}%</span>
+              </div>
+              <div class="prog-track">
+                <div class="prog-fill" style="width:${pct}%"></div>
+              </div>
+            </div>
+          </div>`;
+      }).join('') + '</div>';
+  } catch (e) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Error loading deals</h3><p>${esc(e.message)}</p></div>`;
+    console.error(e);
+  }
+}
+
+async function createDeal() {
+  const address = document.getElementById('ndAddress').value.trim();
+  if (!address) { toast('Please enter a property address', 'error'); return; }
+
+  const btn = document.getElementById('createDealBtn');
+  btn.innerHTML = '<span class="spin-sm"></span> Creating…';
+  btn.disabled = true;
+
+  try {
+    const res = await at('POST', TBL_DEALS, '', '', {
+      records: [{ fields: {
+        'Property Address': address,
+        'Agent Name': currentAgent.fields['Name'],
+        'Agent ID': currentAgent.id,
+        'Status': 'Active',
+        'Deal Type': document.getElementById('ndType').value,
+        'Notes': document.getElementById('ndNotes').value.trim(),
+        'Created Date': new Date().toLocaleDateString('en-US')
+      }}]
+    });
+    currentDeal = res.records[0];
+    document.getElementById('ndAddress').value = '';
+    document.getElementById('ndNotes').value = '';
+    toast('Deal created! ✓', 'success');
+    await openChecklist();
+  } catch (e) {
+    toast('Error creating deal', 'error');
+    console.error(e);
+  } finally {
+    btn.innerHTML = 'Create Deal &amp; Open Checklist →';
+    btn.disabled = false;
+  }
+}
+
+async function openDeal(dealId) {
+  const agentName = currentAgent.fields['Name'];
+  const formula = encodeURIComponent(`{Agent Name}="${agentName}"`);
+  const deals = await atAll(TBL_DEALS, `filterByFormula=${formula}`);
+  currentDeal = deals.find(d => d.id === dealId);
+  await openChecklist();
+}
+
+async function openChecklist() {
+  goTo('checklist');
+  const list = document.getElementById('clList');
+  list.innerHTML = '<div class="loader"><div class="spin"></div>Loading checklist…</div>';
+
+  const addr = currentDeal.fields['Property Address'] || 'No address';
+  document.getElementById('bannerAddr').textContent = addr;
+  document.getElementById('clSub').textContent = addr.length > 28 ? addr.slice(0,28)+'…' : addr;
+  const type = currentDeal.fields['Deal Type'] || '';
+  const created = currentDeal.fields['Created Date'] || '';
+  document.getElementById('bannerMeta').textContent = [type, created ? `Started ${created}` : ''].filter(Boolean).join(' · ');
+
+  const curStatus = currentDeal.fields['Status'] || 'Active';
+  document.getElementById('statusPills').innerHTML =
+    ['Active','Under Contract','Closed','Dead'].map(s =>
+      `<span class="status-pill ${s===curStatus?'active':''}"
+        onclick="setDealStatus('${currentDeal.id}','${s}',this)">${s}</span>`
+    ).join('');
+
+  try {
+    if (!tasks.length) {
+      tasks = await atAll(TBL_CHECKLIST, 'sort[0][field]=Order&sort[0][direction]=asc');
+    }
+    const existing = await atAll(TBL_RESPONSES, `filterByFormula=${encodeURIComponent(`{Deal ID}="${currentDeal.id}"`)}`);
+    responses = {};
+    existing.forEach(r => {
+      responses[r.fields['Task']] = { id: r.id, status: r.fields['Status']||'', notes: r.fields['Notes']||'' };
+    });
+    renderChecklist();
+  } catch (e) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Error</h3><p>${esc(e.message)}</p></div>`;
+    console.error(e);
+  }
+}
+
+function renderChecklist() {
+  updateDonut();
+  const list = document.getElementById('clList');
+  list.innerHTML = tasks.map((t, i) => {
+    const name = t.fields['Task'];
+    const resp = responses[name] || { status: '', notes: '' };
+    const sc = resp.status === 'Yes' ? 's-yes' : resp.status === 'No' ? 's-no' : resp.status === 'N/A' ? 's-na' : '';
+    const bc = resp.status === 'Yes' ? 'done' : resp.status === 'No' ? 'no' : resp.status === 'N/A' ? 'na' : '';
+    const bi = resp.status === 'Yes' ? '✓' : resp.status === 'No' ? '✕' : resp.status === 'N/A' ? '—' : i + 1;
+    return `
+      <div class="cl-item ${sc}" id="cli-${i}">
+        <div class="cl-header" onclick="toggleCl(${i})">
+          <div class="cl-bubble ${bc}" id="clb-${i}">${bi}</div>
+          <div class="cl-task ${resp.status?'answered':''}" id="clt-${i}">${esc(name)}</div>
+          <div class="cl-arrow" id="cla-${i}">▾</div>
+        </div>
+        <div class="cl-body" id="clbd-${i}">
+          <div class="cl-inner">
+            <div class="resp-row">
+              <button class="resp-btn r-yes ${resp.status==='Yes'?'active':''}"
+                onclick="setResp(${i},'Yes','${escJ(name)}')">✓ Yes</button>
+              <button class="resp-btn r-no ${resp.status==='No'?'active':''}"
+                onclick="setResp(${i},'No','${escJ(name)}')">✕ No</button>
+              <button class="resp-btn r-na ${resp.status==='N/A'?'active':''}"
+                onclick="setResp(${i},'N/A','${escJ(name)}')">— N/A</button>
+            </div>
+            <div class="notes-label">Notes</div>
+            <textarea class="notes-input" id="cln-${i}" placeholder="Optional notes…">${esc(resp.notes)}</textarea>
+            <button class="save-notes-btn" id="cls-${i}" onclick="saveNotes(${i},'${escJ(name)}')">Save Notes</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleCl(i) {
+  const body = document.getElementById('clbd-' + i);
+  const arr  = document.getElementById('cla-' + i);
+  const wasOpen = body.classList.contains('open');
+  document.querySelectorAll('.cl-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.cl-arrow').forEach(a => a.classList.remove('open'));
+  if (!wasOpen) { body.classList.add('open'); arr.classList.add('open'); }
+}
+
+async function setResp(i, status, taskName) {
+  const resp = responses[taskName] || { status:'', notes:'' };
+  resp.status = status;
+  responses[taskName] = resp;
+
+  const item = document.getElementById('cli-' + i);
+  item.className = 'cl-item ' + (status==='Yes'?'s-yes':status==='No'?'s-no':'s-na');
+  const bub = document.getElementById('clb-' + i);
+  bub.className = 'cl-bubble ' + (status==='Yes'?'done':status==='No'?'no':'na');
+  bub.textContent = status==='Yes'?'✓':status==='No'?'✕':'—';
+  const tsk = document.getElementById('clt-' + i);
+  tsk.className = 'cl-task answered';
+  item.querySelectorAll('.resp-btn').forEach(b => b.classList.remove('active'));
+  item.querySelector(`.resp-btn.r-${status==='N/A'?'na':status.toLowerCase()}`)?.classList.add('active');
+  updateDonut();
+
+  try {
+    const notes = document.getElementById('cln-' + i)?.value || '';
+    if (resp.id) {
+      await at('PATCH', TBL_RESPONSES, resp.id, '', { fields: { Status: status, Notes: notes, 'Updated At': new Date().toISOString() } });
+    } else {
+      const res = await at('POST', TBL_RESPONSES, '', '', { records: [{ fields: { 'Deal ID': currentDeal.id, 'Task': taskName, 'Status': status, 'Notes': notes, 'Updated At': new Date().toISOString() } }] });
+      responses[taskName].id = res.records[0].id;
+    }
+    toast('Saved ✓', 'success');
+  } catch (e) { toast('Error saving', 'error'); console.error(e); }
+}
+
+async function saveNotes(i, taskName) {
+  const notes = document.getElementById('cln-' + i).value;
+  const resp = responses[taskName] || { status:'', notes:'' };
+  resp.notes = notes;
+  const btn = document.getElementById('cls-' + i);
+  btn.textContent = '…'; btn.disabled = true;
+  try {
+    if (resp.id) {
+      await at('PATCH', TBL_RESPONSES, resp.id, '', { fields: { Notes: notes, 'Updated At': new Date().toISOString() } });
+    } else if (resp.status) {
+      const res = await at('POST', TBL_RESPONSES, '', '', { records: [{ fields: { 'Deal ID': currentDeal.id, 'Task': taskName, 'Status': resp.status, 'Notes': notes, 'Updated At': new Date().toISOString() } }] });
+      responses[taskName] = { ...resp, id: res.records[0].id };
+    }
+    btn.textContent = 'Saved ✓'; btn.classList.add('saved');
+    setTimeout(() => { btn.textContent = 'Save Notes'; btn.classList.remove('saved'); btn.disabled = false; }, 1800);
+  } catch (e) {
+    btn.textContent = 'Save Notes'; btn.disabled = false; toast('Error saving notes', 'error');
+  }
+}
+
+async function setDealStatus(dealId, status, el) {
+  document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  try {
+    await at('PATCH', TBL_DEALS, dealId, '', { fields: { Status: status } });
+    currentDeal.fields['Status'] = status;
+    toast(`Status → ${status}`, 'success');
+  } catch (e) { toast('Error updating status', 'error'); }
+}
+
+function updateDonut() {
+  const answered = Object.values(responses).filter(r => r.status).length;
+  const total    = tasks.length || 22;
+  const pct      = answered / total;
+  const circ     = 2 * Math.PI * 30;
+  document.getElementById('dNum').textContent = answered;
+  document.getElementById('dDen').textContent = `/${total}`;
+  document.getElementById('donutFill').style.strokeDashoffset = circ * (1 - pct);
+  document.getElementById('progMsg').textContent =
+    answered === total ? '🎉 All items complete!' :
+    `${Math.round(pct*100)}% complete · ${total - answered} remaining`;
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJ(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"'); }
+
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' t-'+type : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = 'toast'; }, 2400);
+}
+</script>
+</body>
+</html>
