@@ -1,1168 +1,1124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0d1b2e" />
-  <title>ROA KC · Due Diligence</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ROA KC Due Diligence</title>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-light: #1a2f45;
+    --navy-mid: #142238;
+    --gold: #d4a843;
+    --gold-light: #f0c060;
+    --gold-dim: rgba(212,168,67,0.15);
+    --white: #ffffff;
+    --off-white: #f8f9fa;
+    --gray: #6c757d;
+    --gray-light: #e9ecef;
+    --success: #28a745;
+    --danger: #dc3545;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
 
-    :root {
-      --navy:    #0d1b2e;
-      --navy2:   #1a3152;
-      --gold:    #f5a623;
-      --gold2:   #e8960f;
-      --bg:      #f0f2f7;
-      --surface: #ffffff;
-      --border:  #e4e8f0;
-      --text:    #111827;
-      --muted:   #6b7280;
-      --green:   #10b981;
-      --red:     #ef4444;
-      --amber:   #f59e0b;
-      --blue:    #3b82f6;
-      --purple:  #8b5cf6;
-      --radius:  16px;
-      --radius-sm: 10px;
-      --shadow:  0 4px 24px rgba(13,27,46,.10);
-      --shadow-sm: 0 2px 8px rgba(13,27,46,.07);
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    html { height: 100%; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100%;
-      min-height: 100dvh;
-      overflow-x: hidden;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
 
-    .app { position: relative; min-height: 100dvh; }
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--navy);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 12px;
+  }
+  .header-back {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--gold);
+    font-size: 20px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .header-back:active { background: rgba(255,255,255,0.2); }
+  .header-title {
+    flex: 1;
+  }
+  .header-title h1 {
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .header-title p {
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-top: 1px;
+  }
+  .header-logo {
+    width: 38px;
+    height: 38px;
+    background: var(--gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .header-agent-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    border: 2px solid var(--gold);
+  }
 
-    .screen {
-      display: none;
-      flex-direction: column;
-      min-height: 100dvh;
-      animation: fadeIn .22s ease;
-    }
-    .screen.active { display: flex; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  /* ─── SCREENS ─── */
+  .screen { display: none; }
+  .screen.active { display: block; }
 
-    .topbar {
-      background: var(--navy);
-      padding: 16px 20px;
-      padding-top: max(16px, env(safe-area-inset-top));
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .topbar-logo {
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -.3px;
-      flex: 1;
-    }
-    .topbar-logo span { color: var(--gold); }
-    .topbar-sub {
-      font-size: 11px;
-      color: rgba(255,255,255,.55);
-      font-weight: 500;
-      letter-spacing: .2px;
-      margin-top: 1px;
-    }
-    .back-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px; height: 36px;
-      background: rgba(255,255,255,.12);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 18px;
-      flex-shrink: 0;
-      transition: background .15s;
-    }
-    .back-btn:hover { background: rgba(255,255,255,.2); }
-    .settings-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px; height: 36px;
-      background: rgba(255,255,255,.10);
-      border: none;
-      border-radius: 10px;
-      color: rgba(255,255,255,.75);
-      cursor: pointer;
-      font-size: 16px;
-      transition: background .15s;
-    }
-    .settings-btn:hover { background: rgba(255,255,255,.2); }
+  /* ─── LOADING ─── */
+  .loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+  }
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--gray-light);
+    border-top: 4px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--gray); font-size: 15px; }
 
-    .page-content {
-      flex: 1;
-      padding: 20px 16px;
-      padding-bottom: max(24px, env(safe-area-inset-bottom));
-      max-width: 600px;
-      width: 100%;
-      margin: 0 auto;
-    }
+  /* ─── AGENT PICKER ─── */
+  .picker-hero {
+    background: var(--navy);
+    padding: 28px 20px 24px;
+    text-align: center;
+  }
+  .picker-hero h2 {
+    color: var(--white);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .picker-hero p {
+    color: var(--gold);
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  .search-wrap {
+    padding: 16px 20px 8px;
+    background: var(--off-white);
+    position: sticky;
+    top: 66px;
+    z-index: 90;
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid var(--gray-light);
+    border-radius: 12px;
+    font-size: 16px;
+    background: white;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 14px center;
+  }
+  .search-input:focus { border-color: var(--gold); }
+  .agents-list { padding: 8px 20px 24px; }
+  .agent-card {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 2px solid transparent;
+    text-decoration: none;
+    color: inherit;
+  }
+  .agent-card:active { transform: scale(0.98); box-shadow: none; }
+  .agent-card.selected { border-color: var(--gold); background: var(--gold-dim); }
+  .agent-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .agent-info { flex: 1; min-width: 0; }
+  .agent-name { font-weight: 600; font-size: 15px; color: var(--navy); }
+  .agent-legal { font-size: 12px; color: var(--gray); margin-top: 2px; }
+  .agent-chevron { color: var(--gold); font-size: 18px; }
 
-    .setup-hero {
-      background: var(--navy);
-      padding: 48px 24px 40px;
-      text-align: center;
-    }
-    .setup-hero-icon {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 34px;
-      margin: 0 auto 20px;
-      box-shadow: 0 8px 32px rgba(245,166,35,.35);
-    }
-    .setup-hero h1 {
-      font-size: 26px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -.5px;
-      margin-bottom: 8px;
-    }
-    .setup-hero p { font-size: 15px; color: rgba(255,255,255,.6); line-height: 1.5; }
+  /* ─── DEALS SCREEN ─── */
+  .deals-content { padding: 20px; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .deal-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-left: 4px solid var(--gold);
+  }
+  .deal-card:active { transform: scale(0.99); box-shadow: none; }
+  .deal-card.closed { border-left-color: var(--gray-light); opacity: 0.7; }
+  .deal-header { display: flex; align-items: flex-start; gap: 12px; }
+  .deal-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--gold-dim);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .deal-info { flex: 1; min-width: 0; }
+  .deal-address { font-weight: 700; font-size: 15px; color: var(--navy); margin-bottom: 4px; }
+  .deal-meta { font-size: 13px; color: var(--gray); }
+  .deal-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .deal-status.active { background: rgba(40,167,69,0.12); color: var(--success); }
+  .deal-status.closed { background: var(--gray-light); color: var(--gray); }
+  .deal-progress-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--gray-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+  .progress-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+  }
 
-    .setup-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 28px 24px;
-      box-shadow: var(--shadow);
-    }
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--navy);
-      margin-bottom: 8px;
-      letter-spacing: .1px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-family: inherit;
-      color: var(--text);
-      background: #f9fafc;
-      outline: none;
-      transition: border-color .18s, background .18s;
-    }
-    .form-input:focus { border-color: var(--navy); background: #fff; }
-    .form-input::placeholder { color: #b0b7c3; }
-    textarea.form-input { resize: vertical; min-height: 88px; }
-    select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-    .form-hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
-    .form-group { margin-bottom: 20px; }
-    .form-group:last-child { margin-bottom: 0; }
+  /* ─── FAB ─── */
+  .fab {
+    position: fixed;
+    bottom: 28px;
+    right: 20px;
+    width: 58px;
+    height: 58px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(212,168,67,0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--navy);
+    font-weight: 700;
+    z-index: 200;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .fab:active { transform: scale(0.93); box-shadow: 0 2px 10px rgba(212,168,67,0.4); }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 15px 24px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      transition: transform .12s, opacity .15s, box-shadow .15s;
-      letter-spacing: -.1px;
-    }
-    .btn:active { transform: scale(.97); }
-    .btn:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-full { width: 100%; }
-    .btn-primary {
-      background: var(--navy);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(13,27,46,.3);
-    }
-    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(13,27,46,.4); }
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(245,166,35,.35);
-    }
-    .btn-gold:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(245,166,35,.45); }
-    .btn-outline {
-      background: transparent;
-      color: var(--navy);
-      border: 1.5px solid var(--border);
-    }
-    .btn-sm { padding: 10px 16px; font-size: 13px; border-radius: 8px; }
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .empty-icon { font-size: 56px; margin-bottom: 16px; }
+  .empty-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; color: var(--gray); line-height: 1.5; }
 
-    .agents-hero {
-      background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
-      padding: 28px 20px 32px;
-    }
-    .agents-hero h2 {
-      font-size: 22px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -.4px;
-      margin-bottom: 4px;
-    }
-    .agents-hero p { font-size: 14px; color: rgba(255,255,255,.6); }
+  /* ─── CHECKLIST SCREEN ─── */
+  .checklist-deal-info {
+    background: var(--navy);
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .deal-info-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(212,168,67,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .deal-info-text { flex: 1; min-width: 0; }
+  .deal-info-address { color: white; font-weight: 700; font-size: 15px; }
+  .deal-info-sub { color: var(--gold); font-size: 12px; margin-top: 2px; }
 
-    .search-box {
-      position: relative;
-      margin: -20px 16px 0;
-      z-index: 10;
-    }
-    .search-box input {
-      width: 100%;
-      padding: 15px 16px 15px 48px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-family: inherit;
-      outline: none;
-      box-shadow: var(--shadow);
-      transition: border-color .18s;
-    }
-    .search-box input:focus { border-color: var(--navy); }
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      pointer-events: none;
-    }
-    .agents-list-wrap { padding: 16px 16px 24px; }
-    .agents-count {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 12px;
-    }
+  .progress-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: white;
+    margin: 16px 20px;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .ring-svg { flex-shrink: 0; }
+  .ring-bg { fill: none; stroke: var(--gray-light); stroke-width: 8; }
+  .ring-fill {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+  .ring-text-wrap { flex: 1; }
+  .ring-percent { font-size: 28px; font-weight: 800; color: var(--navy); }
+  .ring-label { font-size: 13px; color: var(--gray); margin-top: 2px; }
+  .ring-count { font-size: 12px; color: var(--gold); font-weight: 600; margin-top: 4px; }
 
-    .agent-grid { display: flex; flex-direction: column; gap: 8px; }
-    .agent-row {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: border-color .15s, box-shadow .15s, transform .12s;
-    }
-    .agent-row:hover { border-color: var(--navy2); box-shadow: var(--shadow-sm); }
-    .agent-row:active { transform: scale(.99); }
+  .checklist-section { padding: 0 20px 8px; }
+  .checklist-cat-header {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray);
+    padding: 12px 0 8px;
+  }
+  .checklist-item {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.15s;
+    border: 2px solid transparent;
+  }
+  .checklist-item:active { transform: scale(0.99); }
+  .checklist-item.done { border-color: rgba(40,167,69,0.2); }
+  .check-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid var(--gray-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    background: white;
+  }
+  .checklist-item.done .check-circle {
+    border-color: var(--success);
+    background: var(--success);
+  }
+  .check-tick {
+    color: white;
+    font-size: 14px;
+    display: none;
+  }
+  .checklist-item.done .check-tick { display: block; }
+  .item-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--navy);
+    line-height: 1.4;
+  }
+  .checklist-item.done .item-text {
+    text-decoration: line-through;
+    color: var(--gray);
+  }
+  .item-order {
+    font-size: 11px;
+    color: var(--gray-light);
+    flex-shrink: 0;
+    font-weight: 600;
+  }
 
-    .avatar {
-      width: 46px; height: 46px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 15px;
-      color: #fff;
-      flex-shrink: 0;
-      letter-spacing: -.5px;
-    }
-    .agent-info { flex: 1; min-width: 0; }
-    .agent-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .agent-email { font-size: 12px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .chevron { color: #c5cdd8; font-size: 20px; font-weight: 300; flex-shrink: 0; }
+  .checklist-bottom-pad { height: 80px; }
 
-    .deals-header { padding: 24px 20px 0; }
-    .deals-header h2 { font-size: 20px; font-weight: 800; color: var(--text); }
-    .deals-header p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 0 env(safe-area-inset-bottom, 20px);
+    animation: slideUp 0.25s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--gray-light);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+  .modal-header {
+    padding: 16px 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gray-light);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+  }
+  .modal-body { padding: 16px 20px 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--gray-light);
+    border-radius: 10px;
+    font-size: 15px;
+    color: var(--navy);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+  .form-textarea { resize: none; height: 80px; }
+  .form-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  .form-btn:active { opacity: 0.85; }
+  .form-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .deals-grid { display: flex; flex-direction: column; gap: 12px; }
-    .deal-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      cursor: pointer;
-      transition: border-color .15s, box-shadow .15s, transform .12s;
-      overflow: hidden;
-      position: relative;
-    }
-    .deal-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 4px;
-      background: var(--gold);
-      border-radius: 0 3px 3px 0;
-    }
-    .deal-card:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(245,166,35,.15); }
-    .deal-card:active { transform: scale(.99); }
-    .deal-address {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 10px;
-      padding-left: 8px;
-      line-height: 1.3;
-    }
-    .deal-chips { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 8px; margin-bottom: 14px; }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .chip-active   { background: #ecfdf5; color: #065f46; }
-    .chip-contract { background: #fff7ed; color: #9a3412; }
-    .chip-closed   { background: #eff6ff; color: #1e40af; }
-    .chip-dead     { background: #fef2f2; color: #991b1b; }
-    .chip-buyer    { background: #eff6ff; color: #1d4ed8; }
-    .chip-seller   { background: #faf5ff; color: #6b21a8; }
-    .chip-both     { background: #ecfdf5; color: #065f46; }
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 1000;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 
-    .deal-prog-wrap { padding-left: 8px; }
-    .prog-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-    .prog-label { font-size: 12px; color: var(--muted); font-weight: 500; }
-    .prog-pct { font-size: 12px; font-weight: 700; color: var(--navy); }
-    .prog-track { background: var(--border); border-radius: 99px; height: 5px; overflow: hidden; }
-    .prog-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green) 0%, #34d399 100%); transition: width .4s ease; }
+  /* ─── UTIL ─── */
+  .switch-agent-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .error-banner {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin: 16px 20px;
+  }
 
-    .fab {
-      position: fixed;
-      bottom: max(24px, env(safe-area-inset-bottom));
-      right: 20px;
-      width: 56px; height: 56px;
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
-      border: none;
-      border-radius: 18px;
-      color: #fff;
-      font-size: 28px;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 6px 24px rgba(245,166,35,.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .15s, box-shadow .15s;
-      z-index: 90;
-    }
-    .fab:hover { transform: scale(1.06); box-shadow: 0 8px 28px rgba(245,166,35,.55); }
-    .fab:active { transform: scale(.95); }
+  .no-results { text-align: center; padding: 40px 20px; color: var(--gray); }
 
-    .new-deal-wrap { padding: 20px 16px 120px; max-width: 600px; margin: 0 auto; }
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 12px;
-    }
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-      border: 1.5px solid var(--border);
-    }
-
-    .deal-banner {
-      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
-      padding: 20px;
-    }
-    .deal-banner-addr {
-      font-size: 17px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -.3px;
-      margin-bottom: 4px;
-    }
-    .deal-banner-meta { font-size: 13px; color: rgba(255,255,255,.6); }
-
-    .status-pills {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-    .status-pill {
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1.5px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.75);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .status-pill.active { background: var(--gold); border-color: var(--gold); color: #fff; }
-
-    .prog-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin: 16px;
-      box-shadow: var(--shadow-sm);
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .prog-donut-wrap { position: relative; flex-shrink: 0; }
-    .prog-donut { transform: rotate(-90deg); }
-    .donut-bg { fill: none; stroke: var(--border); stroke-width: 5; }
-    .donut-fill { fill: none; stroke: var(--green); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset .5s ease; }
-    .donut-label {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .donut-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
-    .donut-den { font-size: 11px; color: var(--muted); margin-top: 1px; }
-    .prog-info { flex: 1; }
-    .prog-info h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .prog-info p { font-size: 13px; color: var(--muted); line-height: 1.4; }
-
-    .cl-list { padding: 0 16px 100px; display: flex; flex-direction: column; gap: 8px; }
-    .cl-item {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: border-color .15s;
-    }
-    .cl-item.s-yes  { border-left: 4px solid var(--green); }
-    .cl-item.s-no   { border-left: 4px solid var(--red); }
-    .cl-item.s-na   { border-left: 4px solid #94a3b8; }
-
-    .cl-header {
-      padding: 15px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .cl-bubble {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      flex-shrink: 0;
-      background: var(--bg);
-      color: var(--muted);
-      transition: background .2s, color .2s;
-    }
-    .cl-bubble.done { background: var(--green); color: #fff; }
-    .cl-bubble.no   { background: var(--red); color: #fff; }
-    .cl-bubble.na   { background: #94a3b8; color: #fff; }
-
-    .cl-task { font-size: 14px; font-weight: 500; line-height: 1.4; flex: 1; color: var(--text); }
-    .cl-task.answered { color: var(--muted); text-decoration: line-through; opacity: .75; }
-    .cl-arrow { color: #c5cdd8; font-size: 18px; flex-shrink: 0; transition: transform .22s; }
-    .cl-arrow.open { transform: rotate(180deg); }
-
-    .cl-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .28s ease;
-    }
-    .cl-body.open { max-height: 320px; }
-
-    .cl-inner { padding: 0 16px 16px; border-top: 1px solid var(--border); }
-    .resp-row { display: flex; gap: 8px; padding-top: 14px; margin-bottom: 14px; }
-    .resp-btn {
-      flex: 1;
-      padding: 12px 6px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      text-align: center;
-      color: var(--muted);
-      transition: all .15s;
-    }
-    .resp-btn:hover { border-color: #c5cdd8; }
-    .resp-btn.r-yes.active { background: var(--green); border-color: var(--green); color: #fff; }
-    .resp-btn.r-no.active  { background: var(--red);   border-color: var(--red);   color: #fff; }
-    .resp-btn.r-na.active  { background: #94a3b8; border-color: #94a3b8; color: #fff; }
-
-    .notes-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
-    .notes-input {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      font-family: inherit;
-      resize: vertical;
-      min-height: 64px;
-      outline: none;
-      color: var(--text);
-      background: #f9fafc;
-      transition: border-color .15s;
-    }
-    .notes-input:focus { border-color: var(--navy); background: #fff; }
-    .save-notes-btn {
-      margin-top: 8px;
-      padding: 9px 18px;
-      background: var(--navy);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      font-family: inherit;
-      transition: opacity .15s, background .15s;
-    }
-    .save-notes-btn:hover { opacity: .88; }
-    .save-notes-btn.saved { background: var(--green); }
-    .save-notes-btn:disabled { opacity: .5; cursor: not-allowed; }
-
-    .empty {
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--muted);
-    }
-    .empty-icon { font-size: 52px; margin-bottom: 16px; }
-    .empty h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .empty p { font-size: 14px; line-height: 1.5; }
-
-    .loader {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 14px;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .spin {
-      width: 32px; height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--navy);
-      border-radius: 50%;
-      animation: spin .65s linear infinite;
-    }
-    .spin-sm {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2.5px solid rgba(255,255,255,.35);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .65s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .toast {
-      position: fixed;
-      bottom: max(28px, calc(env(safe-area-inset-bottom) + 16px));
-      left: 50%;
-      transform: translateX(-50%) translateY(120px);
-      background: var(--navy);
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 24px;
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 9999;
-      transition: transform .28s cubic-bezier(.34,1.56,.64,1);
-      box-shadow: 0 6px 24px rgba(0,0,0,.3);
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.t-success { background: var(--green); }
-    .toast.t-error { background: var(--red); }
-
-    .av-0 { background: linear-gradient(135deg, #0d1b2e, #1a3152); }
-    .av-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .av-2 { background: linear-gradient(135deg, #10b981, #059669); }
-    .av-3 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-    .av-4 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    .av-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
-    .av-6 { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .av-7 { background: linear-gradient(135deg, #14b8a6, #0d9488); }
-
-    .sec-hd {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .sec-hd h3 { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
-
-    @media (max-width: 380px) {
-      .resp-btn { font-size: 12px; padding: 11px 4px; }
-      .cl-task { font-size: 13px; }
-    }
-  </style>
+  /* Scrollbar hide */
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+</style>
 </head>
 <body>
-<div class="app" id="app">
 
-  <!-- SCREEN: SETUP -->
-  <div class="screen active" id="screen-setup">
-    <div class="setup-hero">
-      <div class="setup-hero-icon">🏡</div>
-      <h1>ROA KC<br>Due Diligence</h1>
-      <p>Track every detail, close every deal.</p>
-    </div>
-    <div class="page-content" style="padding-top:24px">
-      <div class="setup-card card">
-        <div class="form-group">
-          <label class="form-label">Airtable Personal Access Token</label>
-          <input class="form-input" type="password" id="setupToken" placeholder="patXXXXXXXXXXXX…" />
-          <div class="form-hint">Your token is saved locally on this device only and is never shared.</div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="saveSetup()">
-          Get Started →
-        </button>
+<!-- ═══════════════════════════════════════════════
+     SCREEN 1: AGENT PICKER
+══════════════════════════════════════════════════ -->
+<div id="screen-picker" class="screen active">
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-logo">🏡</div>
+      <div class="header-title">
+        <h1>ROA KC Due Diligence</h1>
+        <p>Select your name to continue</p>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN: AGENTS -->
-  <div class="screen" id="screen-agents">
-    <div class="agents-hero">
-      <div class="topbar" style="background:transparent;position:static;padding:0 0 20px">
-        <div style="flex:1">
-          <div class="topbar-logo">ROA KC <span>·</span> Due Diligence</div>
-        </div>
-        <button class="settings-btn" onclick="showSetup()">⚙</button>
-      </div>
-      <h2 style="color:#fff;font-size:20px;font-weight:800;margin-bottom:4px">Select Your Name</h2>
-      <p style="color:rgba(255,255,255,.6);font-size:13px">Tap your name to view your deals</p>
-    </div>
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="agentSearch" placeholder="Search agents…" oninput="filterAgents()" autocomplete="off" />
-    </div>
-    <div class="agents-list-wrap">
-      <div class="agents-count" id="agentsCount"></div>
-      <div class="agent-grid" id="agentGrid">
-        <div class="loader"><div class="spin"></div>Loading agents…</div>
-      </div>
-    </div>
+  <div id="picker-loading" class="loading-screen" style="display:flex;">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading agents...</p>
   </div>
 
-  <!-- SCREEN: DEALS -->
-  <div class="screen" id="screen-deals">
-    <div class="topbar">
-      <button class="back-btn" onclick="goTo('agents',false)">‹</button>
-      <div style="flex:1">
-        <div class="topbar-logo">My Deals</div>
-        <div class="topbar-sub" id="dealsSubtitle"></div>
-      </div>
+  <div id="picker-content" style="display:none;">
+    <div class="search-wrap">
+      <input type="search" class="search-input" id="search-input" placeholder="Search your name..." oninput="filterAgents(this.value)">
     </div>
-    <div class="page-content">
-      <div id="dealGrid">
-        <div class="loader"><div class="spin"></div>Loading deals…</div>
-      </div>
-    </div>
-    <button class="fab" onclick="goTo('new-deal')" title="New Deal">+</button>
+    <div class="agents-list" id="agents-list"></div>
   </div>
 
-  <!-- SCREEN: NEW DEAL -->
-  <div class="screen" id="screen-new-deal">
-    <div class="topbar">
-      <button class="back-btn" onclick="goTo('deals',false)">‹</button>
-      <div style="flex:1">
-        <div class="topbar-logo">New Deal</div>
-        <div class="topbar-sub" id="newDealSub"></div>
-      </div>
-    </div>
-    <div class="new-deal-wrap">
-      <p class="section-title">Deal Details</p>
-      <div class="card">
-        <div class="form-group">
-          <label class="form-label">Property Address *</label>
-          <input class="form-input" type="text" id="ndAddress" placeholder="123 Main St, Kansas City, MO 64111" autocomplete="off" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Representation</label>
-          <select class="form-input" id="ndType">
-            <option value="Buyer Side">Buyer Side</option>
-            <option value="Seller Side">Seller Side</option>
-            <option value="Both Sides">Both Sides</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notes <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-          <textarea class="form-input" id="ndNotes" placeholder="Any notes about this deal…"></textarea>
-        </div>
-        <button class="btn btn-gold btn-full" id="createDealBtn" onclick="createDeal()">
-          Create Deal &amp; Open Checklist →
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCREEN: CHECKLIST -->
-  <div class="screen" id="screen-checklist">
-    <div class="topbar">
-      <button class="back-btn" onclick="goTo('deals',false);loadDeals();">‹</button>
-      <div style="flex:1">
-        <div class="topbar-logo">Checklist</div>
-        <div class="topbar-sub" id="clSub"></div>
-      </div>
-    </div>
-    <div class="deal-banner" id="dealBanner">
-      <div class="deal-banner-addr" id="bannerAddr">Loading…</div>
-      <div class="deal-banner-meta" id="bannerMeta"></div>
-      <div class="status-pills" id="statusPills"></div>
-    </div>
-
-    <div class="prog-card">
-      <div class="prog-donut-wrap">
-        <svg class="prog-donut" width="72" height="72" viewBox="0 0 72 72">
-          <circle class="donut-bg" cx="36" cy="36" r="30"/>
-          <circle class="donut-fill" cx="36" cy="36" r="30" id="donutFill"
-            stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
-        </svg>
-        <div class="donut-label">
-          <div class="donut-num" id="dNum">0</div>
-          <div class="donut-den" id="dDen">/22</div>
-        </div>
-      </div>
-      <div class="prog-info">
-        <h3>Due Diligence</h3>
-        <p id="progMsg">Tap each item to respond</p>
-      </div>
-    </div>
-
-    <div class="cl-list" id="clList">
-      <div class="loader"><div class="spin"></div>Loading checklist…</div>
-    </div>
-  </div>
-
+  <div id="picker-error" class="error-banner" style="display:none;margin-top:20px;"></div>
 </div>
 
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 2: DEALS
+══════════════════════════════════════════════════ -->
+<div id="screen-deals" class="screen">
+  <div class="header">
+    <div class="header-inner">
+      <div id="deals-avatar" class="header-agent-avatar"></div>
+      <div class="header-title">
+        <h1 id="deals-agent-name">Agent</h1>
+        <p>Your Active Deals</p>
+      </div>
+      <button class="switch-agent-btn" onclick="switchAgent()">Switch</button>
+    </div>
+  </div>
+
+  <div id="deals-loading" class="loading-screen" style="display:none;">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading your deals...</p>
+  </div>
+
+  <div id="deals-content" class="deals-content" style="display:none;"></div>
+
+  <button class="fab" id="fab-new-deal" onclick="openNewDealModal()">+</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 3: CHECKLIST
+══════════════════════════════════════════════════ -->
+<div id="screen-checklist" class="screen">
+  <div class="header">
+    <div class="header-inner">
+      <button class="header-back" onclick="goBack()">‹</button>
+      <div class="header-title">
+        <h1>Due Diligence</h1>
+        <p id="checklist-agent-label">Checklist</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="checklist-deal-info">
+    <div class="deal-info-icon">🏠</div>
+    <div class="deal-info-text">
+      <div class="deal-info-address" id="checklist-address"></div>
+      <div class="deal-info-sub" id="checklist-rep"></div>
+    </div>
+  </div>
+
+  <div id="checklist-loading" class="loading-screen" style="display:none;">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading checklist...</p>
+  </div>
+
+  <div id="checklist-content" style="display:none;">
+    <div class="progress-ring-wrap">
+      <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle class="ring-bg" cx="36" cy="36" r="28"/>
+        <circle class="ring-fill" id="ring-fill" cx="36" cy="36" r="28"
+          stroke-dasharray="176"
+          stroke-dashoffset="176"/>
+      </svg>
+      <div class="ring-text-wrap">
+        <div class="ring-percent" id="ring-percent">0%</div>
+        <div class="ring-label">Completed</div>
+        <div class="ring-count" id="ring-count">0 of 0 items</div>
+      </div>
+    </div>
+    <div class="checklist-section" id="checklist-items"></div>
+    <div class="checklist-bottom-pad"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     NEW DEAL MODAL
+══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="new-deal-modal" onclick="closeModalIfBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">New Deal</span>
+      <button class="modal-close" onclick="closeNewDealModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Property Address *</label>
+        <input type="text" class="form-input" id="deal-address" placeholder="123 Main St, Kansas City, MO">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Representation *</label>
+        <select class="form-select" id="deal-rep">
+          <option value="">Select...</option>
+          <option value="Buyer Side">Buyer Side</option>
+          <option value="Seller Side">Seller Side</option>
+          <option value="Both Sides">Both Sides</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <textarea class="form-textarea" id="deal-notes" placeholder="Client name, closing date, etc."></textarea>
+      </div>
+      <button class="form-btn" id="create-deal-btn" onclick="createDeal()">Create Deal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
+
 <script>
-const BASE_ID      = 'appBQCUVrmWNuBWkz';
-const TBL_AGENTS   = 'tblMPOGqjGpxhwlLW';
-const TBL_DEALS    = 'tbla9kUHLsMWElw2E';
-const TBL_CHECKLIST= 'tblcEK9i6ztSIxWeA';
-const TBL_RESPONSES= 'tbl77vD60lgNR2jy9';
+// ═══════════════════════════════════
+// CONFIG — Replace with your deployed Apps Script URL
+// ═══════════════════════════════════
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
 
-let token         = localStorage.getItem('roa_token') || '';
-let allAgents     = [];
-let currentAgent  = null;
-let currentDeal   = null;
-let tasks         = [];
-let responses     = {};
-let currentScreen = 'setup';
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let allAgents = [];
+let allChecklist = [];
+let currentAgent = null; // { displayName, legalName, email }
+let currentDeal = null;
+let currentProgress = {};
 
-window.addEventListener('DOMContentLoaded', () => {
-  if (token) { goTo('agents'); loadAgents(); }
-  else        { goTo('setup'); }
-});
-
-function goTo(name, animate = true) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById('screen-' + name);
-  if (el) el.classList.add('active');
-  currentScreen = name;
-  window.scrollTo(0, 0);
+// ═══════════════════════════════════
+// AVATAR COLOR
+// ═══════════════════════════════════
+const COLORS = [
+  '#1a6b4a','#2d5fa0','#8b3a8b','#c0522b','#2a7a7a',
+  '#6b4a1a','#1a4a6b','#7a2a5a','#4a6b1a','#3a3a8b'
+];
+function avatarColor(name) {
+  let h = 0;
+  for (let c of (name||'')) h = (h * 31 + c.charCodeAt(0)) & 0xfffffff;
+  return COLORS[h % COLORS.length];
+}
+function initials(name) {
+  return (name||'?').split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('');
 }
 
-function showSetup() {
-  document.getElementById('setupToken').value = token;
-  goTo('setup');
+// ═══════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════
+async function apiGet(params) {
+  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Network error ' + res.status);
+  return res.json();
 }
-
-function saveSetup() {
-  const t = document.getElementById('setupToken').value.trim();
-  if (!t) { toast('Please enter your token', 'error'); return; }
-  token = t;
-  localStorage.setItem('roa_token', token);
-  toast('Connected! ✓', 'success');
-  goTo('agents');
-  loadAgents();
-}
-
-async function at(method, table, recordId='', params='', body=null) {
-  let url = `https://api.airtable.com/v0/${BASE_ID}/${table}`;
-  if (recordId) url += '/' + recordId;
-  if (params) url += '?' + params;
-  const opts = {
-    method,
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(url, opts);
-  if (!res.ok) throw new Error(await res.text());
+async function apiPost(data) {
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  if (!res.ok) throw new Error('Network error ' + res.status);
   return res.json();
 }
 
-async function atAll(table, params='') {
-  let recs = [], offset = '';
-  do {
-    const p = params + (offset ? (params ? '&' : '') + 'offset=' + offset : '');
-    const d = await at('GET', table, '', p);
-    recs = recs.concat(d.records);
-    offset = d.offset || '';
-  } while (offset);
-  return recs;
+// ═══════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
-async function loadAgents() {
-  const grid = document.getElementById('agentGrid');
-  grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading agents…</div>';
-  document.getElementById('agentsCount').textContent = '';
-  try {
-    allAgents = await atAll(TBL_AGENTS, 'sort[0][field]=Name&sort[0][direction]=asc');
-    renderAgents(allAgents);
-  } catch (e) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Couldn't load agents</h3><p>Check your token in settings and try again.</p></div>`;
+// ═══════════════════════════════════
+// SCREEN 1: AGENT PICKER
+// ═══════════════════════════════════
+async function initPicker() {
+  // Check if already logged in
+  const saved = localStorage.getItem('roa_agent');
+  if (saved) {
+    try {
+      currentAgent = JSON.parse(saved);
+      showScreen('screen-deals');
+      await loadDeals();
+      return;
+    } catch(e) {
+      localStorage.removeItem('roa_agent');
+    }
   }
-}
 
-const COLORS = ['av-0','av-1','av-2','av-3','av-4','av-5','av-6','av-7'];
-function colorFor(name) { let h=0; for(let c of name) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
-
-function renderAgents(list) {
-  const grid = document.getElementById('agentGrid');
-  const countEl = document.getElementById('agentsCount');
-  if (!list.length) {
-    countEl.textContent = '';
-    grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><h3>No agents found</h3></div>';
+  if (SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+    document.getElementById('picker-loading').style.display = 'none';
+    document.getElementById('picker-error').style.display = 'block';
+    document.getElementById('picker-error').textContent = '⚠️ Setup needed: Replace PASTE_YOUR_APPS_SCRIPT_URL_HERE with your deployed Google Apps Script URL in the index.html file.';
     return;
   }
-  countEl.textContent = `${list.length} Agent${list.length !== 1 ? 's' : ''}`;
-  grid.innerHTML = list.map(a => {
-    const name = a.fields['Name'] || '—';
-    const email = a.fields['Email'] || '';
-    const initials = name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    return `
-      <div class="agent-row" onclick="pickAgent('${a.id}')">
-        <div class="avatar ${colorFor(name)}">${initials}</div>
-        <div class="agent-info">
-          <div class="agent-name">${esc(name)}</div>
-          ${email ? `<div class="agent-email">${esc(email)}</div>` : ''}
-        </div>
-        <div class="chevron">›</div>
-      </div>`;
-  }).join('');
-}
 
-function filterAgents() {
-  const q = document.getElementById('agentSearch').value.toLowerCase();
-  renderAgents(allAgents.filter(a => (a.fields['Name']||'').toLowerCase().includes(q)));
-}
-
-function pickAgent(id) {
-  currentAgent = allAgents.find(a => a.id === id);
-  const name = currentAgent.fields['Name'] || 'Agent';
-  document.getElementById('dealsSubtitle').textContent = name;
-  document.getElementById('newDealSub').textContent = name;
-  goTo('deals');
-  loadDeals();
-}
-
-async function loadDeals() {
-  const grid = document.getElementById('dealGrid');
-  grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading deals…</div>';
   try {
-    const agentName = currentAgent.fields['Name'];
-    const formula = encodeURIComponent(`{Agent Name}="${agentName}"`);
-    const deals = await atAll(TBL_DEALS, `filterByFormula=${formula}&sort[0][field]=Created Date&sort[0][direction]=desc`);
-
-    if (!deals.length) {
-      grid.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">🏠</div>
-          <h3>No deals yet</h3>
-          <p>Tap the <strong>+</strong> button to start your first due diligence checklist.</p>
-        </div>`;
-      return;
-    }
-
-    grid.innerHTML = '<div class="loader"><div class="spin"></div>Loading progress…</div>';
-    const counts = {};
-    for (const d of deals) {
-      const resp = await atAll(TBL_RESPONSES, `filterByFormula=${encodeURIComponent(`{Deal ID}="${d.id}"`)}`);
-      counts[d.id] = resp.filter(r => r.fields['Status']).length;
-    }
-
-    const total = tasks.length || 22;
-    grid.innerHTML = `<div class="sec-hd"><h3>${deals.length} Deal${deals.length!==1?'s':''}</h3></div>` +
-      '<div class="deals-grid">' + deals.map(d => {
-        const addr   = d.fields['Property Address'] || 'No address';
-        const status = d.fields['Status'] || 'Active';
-        const type   = d.fields['Deal Type'] || '';
-        const done   = counts[d.id] || 0;
-        const pct    = Math.round((done / total) * 100);
-        const scls   = { Active:'chip-active', 'Under Contract':'chip-contract', Closed:'chip-closed', Dead:'chip-dead' };
-        const tcls   = { 'Buyer Side':'chip-buyer', 'Seller Side':'chip-seller', 'Both Sides':'chip-both' };
-        return `
-          <div class="deal-card" onclick="openDeal('${d.id}')">
-            <div class="deal-address">${esc(addr)}</div>
-            <div class="deal-chips">
-              <span class="chip ${scls[status]||'chip-active'}">${status}</span>
-              ${type ? `<span class="chip ${tcls[type]||'chip-buyer'}">${type}</span>` : ''}
-            </div>
-            <div class="deal-prog-wrap">
-              <div class="prog-row">
-                <span class="prog-label">${done}/${total} items</span>
-                <span class="prog-pct">${pct}%</span>
-              </div>
-              <div class="prog-track">
-                <div class="prog-fill" style="width:${pct}%"></div>
-              </div>
-            </div>
-          </div>`;
-      }).join('') + '</div>';
-  } catch (e) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Error loading deals</h3><p>${esc(e.message)}</p></div>`;
-    console.error(e);
+    const data = await apiGet({ action: 'getAgents' });
+    if (data.error) throw new Error(data.error);
+    allAgents = data.sort((a,b) => a.displayName.localeCompare(b.displayName));
+    document.getElementById('picker-loading').style.display = 'none';
+    document.getElementById('picker-content').style.display = 'block';
+    renderAgents(allAgents);
+  } catch(err) {
+    document.getElementById('picker-loading').style.display = 'none';
+    document.getElementById('picker-error').style.display = 'block';
+    document.getElementById('picker-error').textContent = '⚠️ Could not load agents: ' + err.message;
   }
+}
+
+function renderAgents(agents) {
+  const list = document.getElementById('agents-list');
+  if (agents.length === 0) {
+    list.innerHTML = '<div class="no-results">No agents found</div>';
+    return;
+  }
+  list.innerHTML = agents.map(a => `
+    <div class="agent-card" onclick="selectAgent(${JSON.stringify(a).split('"').join('&quot;')})">
+      <div class="agent-avatar" style="background:${avatarColor(a.legalName)}">${initials(a.displayName)}</div>
+      <div class="agent-info">
+        <div class="agent-name">${escHtml(a.displayName)}</div>
+        ${a.legalName !== a.displayName ? `<div class="agent-legal">${escHtml(a.legalName)}</div>` : ''}
+      </div>
+      <span class="agent-chevron">›</span>
+    </div>
+  `).join('');
+}
+
+function filterAgents(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { renderAgents(allAgents); return; }
+  renderAgents(allAgents.filter(a =>
+    a.displayName.toLowerCase().includes(q) ||
+    a.legalName.toLowerCase().includes(q)
+  ));
+}
+
+async function selectAgent(agent) {
+  currentAgent = agent;
+  localStorage.setItem('roa_agent', JSON.stringify(agent));
+  showScreen('screen-deals');
+  await loadDeals();
+}
+
+function switchAgent() {
+  localStorage.removeItem('roa_agent');
+  currentAgent = null;
+  showScreen('screen-picker');
+  initPicker();
+}
+
+// ═══════════════════════════════════
+// SCREEN 2: DEALS
+// ═══════════════════════════════════
+async function loadDeals() {
+  const color = avatarColor(currentAgent.legalName);
+  const inits = initials(currentAgent.displayName);
+  document.getElementById('deals-avatar').style.background = color;
+  document.getElementById('deals-avatar').textContent = inits;
+  document.getElementById('deals-agent-name').textContent = currentAgent.displayName;
+
+  const loading = document.getElementById('deals-loading');
+  const content = document.getElementById('deals-content');
+  loading.style.display = 'flex';
+  content.style.display = 'none';
+
+  try {
+    const [deals, checklist] = await Promise.all([
+      apiGet({ action: 'getDeals', legalName: currentAgent.legalName }),
+      apiGet({ action: 'getChecklist' })
+    ]);
+    if (deals.error) throw new Error(deals.error);
+    allChecklist = checklist.error ? [] : checklist;
+
+    // Load progress for all deals
+    const progressData = {};
+    await Promise.all(deals.map(async d => {
+      const p = await apiGet({ action: 'getProgress', dealId: d.dealId });
+      progressData[d.dealId] = Array.isArray(p) ? p : [];
+    }));
+
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    renderDeals(deals, progressData);
+  } catch(err) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    content.innerHTML = `<div class="error-banner">⚠️ Could not load deals: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function renderDeals(deals, progressData) {
+  const content = document.getElementById('deals-content');
+  const active = deals.filter(d => d.status === 'Active');
+  const closed = deals.filter(d => d.status !== 'Active');
+  const total = allChecklist.length || 22;
+
+  if (deals.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🏘️</div>
+        <div class="empty-title">No deals yet</div>
+        <div class="empty-sub">Tap the <strong>+</strong> button to add your first deal and start your checklist!</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  if (active.length > 0) {
+    html += `<div class="section-label">Active Deals (${active.length})</div>`;
+    active.forEach(d => {
+      const prog = progressData[d.dealId] || [];
+      const done = prog.filter(p => p.completed === true || p.completed === 'TRUE').length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      html += dealCardHtml(d, done, total, pct);
+    });
+  }
+  if (closed.length > 0) {
+    html += `<div class="section-label" style="margin-top:${active.length?'20px':'0'}">Closed Deals (${closed.length})</div>`;
+    closed.forEach(d => {
+      const prog = progressData[d.dealId] || [];
+      const done = prog.filter(p => p.completed === true || p.completed === 'TRUE').length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      html += dealCardHtml(d, done, total, pct, true);
+    });
+  }
+  html += '<div style="height:90px;"></div>';
+  content.innerHTML = html;
+}
+
+function dealCardHtml(deal, done, total, pct, isClosed=false) {
+  return `
+    <div class="deal-card${isClosed?' closed':''}" onclick="openDeal(${JSON.stringify(deal).split('"').join('&quot;')})">
+      <div class="deal-header">
+        <div class="deal-icon">🏠</div>
+        <div class="deal-info">
+          <div class="deal-address">${escHtml(deal.address)}</div>
+          <div class="deal-meta">${escHtml(deal.representation||'')}${deal.notes?` · ${escHtml(deal.notes.substring(0,40))}`:''}</div>
+        </div>
+        <span class="deal-status ${isClosed?'closed':'active'}">${isClosed?'Closed':'Active'}</span>
+      </div>
+      <div class="deal-progress-row">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+        <span class="progress-text">${done}/${total}</span>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════
+// NEW DEAL MODAL
+// ═══════════════════════════════════
+function openNewDealModal() {
+  document.getElementById('deal-address').value = '';
+  document.getElementById('deal-rep').value = '';
+  document.getElementById('deal-notes').value = '';
+  document.getElementById('new-deal-modal').classList.add('open');
+}
+function closeNewDealModal() {
+  document.getElementById('new-deal-modal').classList.remove('open');
+}
+function closeModalIfBg(e) {
+  if (e.target === document.getElementById('new-deal-modal')) closeNewDealModal();
 }
 
 async function createDeal() {
-  const address = document.getElementById('ndAddress').value.trim();
-  if (!address) { toast('Please enter a property address', 'error'); return; }
+  const address = document.getElementById('deal-address').value.trim();
+  const rep = document.getElementById('deal-rep').value;
+  const notes = document.getElementById('deal-notes').value.trim();
+  if (!address || !rep) { showToast('Please fill in all required fields'); return; }
 
-  const btn = document.getElementById('createDealBtn');
-  btn.innerHTML = '<span class="spin-sm"></span> Creating…';
+  const btn = document.getElementById('create-deal-btn');
   btn.disabled = true;
+  btn.textContent = 'Creating...';
 
   try {
-    const res = await at('POST', TBL_DEALS, '', '', {
-      records: [{ fields: {
-        'Property Address': address,
-        'Agent Name': currentAgent.fields['Name'],
-        'Agent ID': currentAgent.id,
-        'Status': 'Active',
-        'Deal Type': document.getElementById('ndType').value,
-        'Notes': document.getElementById('ndNotes').value.trim(),
-        'Created Date': new Date().toLocaleDateString('en-US')
-      }}]
+    const result = await apiPost({
+      action: 'createDeal',
+      legalName: currentAgent.legalName,
+      address, representation: rep, notes
     });
-    currentDeal = res.records[0];
-    document.getElementById('ndAddress').value = '';
-    document.getElementById('ndNotes').value = '';
-    toast('Deal created! ✓', 'success');
-    await openChecklist();
-  } catch (e) {
-    toast('Error creating deal', 'error');
-    console.error(e);
+    if (result.error) throw new Error(result.error);
+    closeNewDealModal();
+    showToast('✅ Deal created!');
+    await loadDeals();
+  } catch(err) {
+    showToast('⚠️ ' + err.message);
   } finally {
-    btn.innerHTML = 'Create Deal &amp; Open Checklist →';
     btn.disabled = false;
+    btn.textContent = 'Create Deal';
   }
 }
 
-async function openDeal(dealId) {
-  const agentName = currentAgent.fields['Name'];
-  const formula = encodeURIComponent(`{Agent Name}="${agentName}"`);
-  const deals = await atAll(TBL_DEALS, `filterByFormula=${formula}`);
-  currentDeal = deals.find(d => d.id === dealId);
-  await openChecklist();
-}
+// ═══════════════════════════════════
+// SCREEN 3: CHECKLIST
+// ═══════════════════════════════════
+async function openDeal(deal) {
+  currentDeal = deal;
+  document.getElementById('checklist-agent-label').textContent = currentAgent.displayName;
+  document.getElementById('checklist-address').textContent = deal.address;
+  document.getElementById('checklist-rep').textContent = deal.representation || '';
+  showScreen('screen-checklist');
 
-async function openChecklist() {
-  goTo('checklist');
-  const list = document.getElementById('clList');
-  list.innerHTML = '<div class="loader"><div class="spin"></div>Loading checklist…</div>';
-
-  const addr = currentDeal.fields['Property Address'] || 'No address';
-  document.getElementById('bannerAddr').textContent = addr;
-  document.getElementById('clSub').textContent = addr.length > 28 ? addr.slice(0,28)+'…' : addr;
-  const type = currentDeal.fields['Deal Type'] || '';
-  const created = currentDeal.fields['Created Date'] || '';
-  document.getElementById('bannerMeta').textContent = [type, created ? `Started ${created}` : ''].filter(Boolean).join(' · ');
-
-  const curStatus = currentDeal.fields['Status'] || 'Active';
-  document.getElementById('statusPills').innerHTML =
-    ['Active','Under Contract','Closed','Dead'].map(s =>
-      `<span class="status-pill ${s===curStatus?'active':''}"
-        onclick="setDealStatus('${currentDeal.id}','${s}',this)">${s}</span>`
-    ).join('');
+  const loading = document.getElementById('checklist-loading');
+  const content = document.getElementById('checklist-content');
+  loading.style.display = 'flex';
+  content.style.display = 'none';
 
   try {
-    if (!tasks.length) {
-      tasks = await atAll(TBL_CHECKLIST, 'sort[0][field]=Order&sort[0][direction]=asc');
+    const [progress, checklist] = await Promise.all([
+      apiGet({ action: 'getProgress', dealId: deal.dealId }),
+      allChecklist.length ? Promise.resolve(allChecklist) : apiGet({ action: 'getChecklist' })
+    ]);
+    if (!allChecklist.length && !checklist.error) allChecklist = checklist;
+
+    // Build progress map keyed by itemOrder
+    currentProgress = {};
+    if (Array.isArray(progress)) {
+      progress.forEach(p => {
+        currentProgress[String(p.itemOrder)] = p.completed === true || p.completed === 'TRUE';
+      });
     }
-    const existing = await atAll(TBL_RESPONSES, `filterByFormula=${encodeURIComponent(`{Deal ID}="${currentDeal.id}"`)}`);
-    responses = {};
-    existing.forEach(r => {
-      responses[r.fields['Task']] = { id: r.id, status: r.fields['Status']||'', notes: r.fields['Notes']||'' };
-    });
+
+    loading.style.display = 'none';
+    content.style.display = 'block';
     renderChecklist();
-  } catch (e) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Error</h3><p>${esc(e.message)}</p></div>`;
-    console.error(e);
+  } catch(err) {
+    loading.style.display = 'none';
+    content.style.display = 'block';
+    document.getElementById('checklist-items').innerHTML = `<div class="error-banner">⚠️ ${escHtml(err.message)}</div>`;
   }
 }
 
 function renderChecklist() {
-  updateDonut();
-  const list = document.getElementById('clList');
-  list.innerHTML = tasks.map((t, i) => {
-    const name = t.fields['Task'];
-    const resp = responses[name] || { status: '', notes: '' };
-    const sc = resp.status === 'Yes' ? 's-yes' : resp.status === 'No' ? 's-no' : resp.status === 'N/A' ? 's-na' : '';
-    const bc = resp.status === 'Yes' ? 'done' : resp.status === 'No' ? 'no' : resp.status === 'N/A' ? 'na' : '';
-    const bi = resp.status === 'Yes' ? '✓' : resp.status === 'No' ? '✕' : resp.status === 'N/A' ? '—' : i + 1;
-    return `
-      <div class="cl-item ${sc}" id="cli-${i}">
-        <div class="cl-header" onclick="toggleCl(${i})">
-          <div class="cl-bubble ${bc}" id="clb-${i}">${bi}</div>
-          <div class="cl-task ${resp.status?'answered':''}" id="clt-${i}">${esc(name)}</div>
-          <div class="cl-arrow" id="cla-${i}">▾</div>
-        </div>
-        <div class="cl-body" id="clbd-${i}">
-          <div class="cl-inner">
-            <div class="resp-row">
-              <button class="resp-btn r-yes ${resp.status==='Yes'?'active':''}"
-                onclick="setResp(${i},'Yes','${escJ(name)}')">✓ Yes</button>
-              <button class="resp-btn r-no ${resp.status==='No'?'active':''}"
-                onclick="setResp(${i},'No','${escJ(name)}')">✕ No</button>
-              <button class="resp-btn r-na ${resp.status==='N/A'?'active':''}"
-                onclick="setResp(${i},'N/A','${escJ(name)}')">— N/A</button>
-            </div>
-            <div class="notes-label">Notes</div>
-            <textarea class="notes-input" id="cln-${i}" placeholder="Optional notes…">${esc(resp.notes)}</textarea>
-            <button class="save-notes-btn" id="cls-${i}" onclick="saveNotes(${i},'${escJ(name)}')">Save Notes</button>
+  const items = allChecklist;
+  const totalItems = items.length;
+  const doneCount = items.filter(i => currentProgress[String(i.order)]).length;
+  const pct = totalItems > 0 ? Math.round((doneCount / totalItems) * 100) : 0;
+  const circumference = 2 * Math.PI * 28;
+  const offset = circumference - (pct / 100) * circumference;
+
+  document.getElementById('ring-percent').textContent = pct + '%';
+  document.getElementById('ring-count').textContent = doneCount + ' of ' + totalItems + ' items';
+  document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  document.getElementById('ring-fill').style.strokeDasharray = circumference;
+
+  // Group by category
+  const categories = {};
+  items.forEach(i => {
+    if (!categories[i.category]) categories[i.category] = [];
+    categories[i.category].push(i);
+  });
+
+  let html = '';
+  Object.entries(categories).forEach(([cat, catItems]) => {
+    html += `<div class="checklist-cat-header">${escHtml(cat)}</div>`;
+    catItems.forEach(item => {
+      const done = !!currentProgress[String(item.order)];
+      html += `
+        <div class="checklist-item${done?' done':''}" id="item-${item.order}" onclick="toggleItem(${item.order})">
+          <div class="check-circle">
+            <span class="check-tick">✓</span>
           </div>
-        </div>
-      </div>`;
-  }).join('');
+          <div class="item-text">${escHtml(item.item)}</div>
+          <span class="item-order">#${item.order}</span>
+        </div>`;
+    });
+  });
+
+  document.getElementById('checklist-items').innerHTML = html;
 }
 
-function toggleCl(i) {
-  const body = document.getElementById('clbd-' + i);
-  const arr  = document.getElementById('cla-' + i);
-  const wasOpen = body.classList.contains('open');
-  document.querySelectorAll('.cl-body').forEach(b => b.classList.remove('open'));
-  document.querySelectorAll('.cl-arrow').forEach(a => a.classList.remove('open'));
-  if (!wasOpen) { body.classList.add('open'); arr.classList.add('open'); }
-}
-
-async function setResp(i, status, taskName) {
-  const resp = responses[taskName] || { status:'', notes:'' };
-  resp.status = status;
-  responses[taskName] = resp;
-
-  const item = document.getElementById('cli-' + i);
-  item.className = 'cl-item ' + (status==='Yes'?'s-yes':status==='No'?'s-no':'s-na');
-  const bub = document.getElementById('clb-' + i);
-  bub.className = 'cl-bubble ' + (status==='Yes'?'done':status==='No'?'no':'na');
-  bub.textContent = status==='Yes'?'✓':status==='No'?'✕':'—';
-  const tsk = document.getElementById('clt-' + i);
-  tsk.className = 'cl-task answered';
-  item.querySelectorAll('.resp-btn').forEach(b => b.classList.remove('active'));
-  item.querySelector(`.resp-btn.r-${status==='N/A'?'na':status.toLowerCase()}`)?.classList.add('active');
-  updateDonut();
+async function toggleItem(order) {
+  const key = String(order);
+  const newVal = !currentProgress[key];
+  currentProgress[key] = newVal;
+  renderChecklist(); // optimistic update
 
   try {
-    const notes = document.getElementById('cln-' + i)?.value || '';
-    if (resp.id) {
-      await at('PATCH', TBL_RESPONSES, resp.id, '', { fields: { Status: status, Notes: notes, 'Updated At': new Date().toISOString() } });
-    } else {
-      const res = await at('POST', TBL_RESPONSES, '', '', { records: [{ fields: { 'Deal ID': currentDeal.id, 'Task': taskName, 'Status': status, 'Notes': notes, 'Updated At': new Date().toISOString() } }] });
-      responses[taskName].id = res.records[0].id;
-    }
-    toast('Saved ✓', 'success');
-  } catch (e) { toast('Error saving', 'error'); console.error(e); }
-}
-
-async function saveNotes(i, taskName) {
-  const notes = document.getElementById('cln-' + i).value;
-  const resp = responses[taskName] || { status:'', notes:'' };
-  resp.notes = notes;
-  const btn = document.getElementById('cls-' + i);
-  btn.textContent = '…'; btn.disabled = true;
-  try {
-    if (resp.id) {
-      await at('PATCH', TBL_RESPONSES, resp.id, '', { fields: { Notes: notes, 'Updated At': new Date().toISOString() } });
-    } else if (resp.status) {
-      const res = await at('POST', TBL_RESPONSES, '', '', { records: [{ fields: { 'Deal ID': currentDeal.id, 'Task': taskName, 'Status': resp.status, 'Notes': notes, 'Updated At': new Date().toISOString() } }] });
-      responses[taskName] = { ...resp, id: res.records[0].id };
-    }
-    btn.textContent = 'Saved ✓'; btn.classList.add('saved');
-    setTimeout(() => { btn.textContent = 'Save Notes'; btn.classList.remove('saved'); btn.disabled = false; }, 1800);
-  } catch (e) {
-    btn.textContent = 'Save Notes'; btn.disabled = false; toast('Error saving notes', 'error');
+    await apiPost({
+      action: 'updateProgress',
+      dealId: currentDeal.dealId,
+      itemOrder: order,
+      completed: newVal
+    });
+  } catch(err) {
+    // Revert on failure
+    currentProgress[key] = !newVal;
+    renderChecklist();
+    showToast('⚠️ Save failed');
   }
 }
 
-async function setDealStatus(dealId, status, el) {
-  document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  try {
-    await at('PATCH', TBL_DEALS, dealId, '', { fields: { Status: status } });
-    currentDeal.fields['Status'] = status;
-    toast(`Status → ${status}`, 'success');
-  } catch (e) { toast('Error updating status', 'error'); }
+function goBack() {
+  showScreen('screen-deals');
 }
 
-function updateDonut() {
-  const answered = Object.values(responses).filter(r => r.status).length;
-  const total    = tasks.length || 22;
-  const pct      = answered / total;
-  const circ     = 2 * Math.PI * 30;
-  document.getElementById('dNum').textContent = answered;
-  document.getElementById('dDen').textContent = `/${total}`;
-  document.getElementById('donutFill').style.strokeDashoffset = circ * (1 - pct);
-  document.getElementById('progMsg').textContent =
-    answered === total ? '🎉 All items complete!' :
-    `${Math.round(pct*100)}% complete · ${total - answered} remaining`;
+// ═══════════════════════════════════
+// TOAST
+// ═══════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function escJ(s) { return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"'); }
-
-function toast(msg, type='') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (type ? ' t-'+type : '');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => { el.className = 'toast'; }, 2400);
+// ═══════════════════════════════════
+// UTIL
+// ═══════════════════════════════════
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+document.addEventListener('DOMContentLoaded', initPicker);
 </script>
 </body>
 </html>
