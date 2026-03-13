@@ -1092,6 +1092,8 @@ async function toggleItem(order) {
 
 function goBack() {
   showScreen('screen-deals');
+  // Refresh progress bars on dashboard to reflect latest checklist changes
+  if (currentAgent) loadAgentDeals();
 }
 
 // ═══════════════════════════════════
